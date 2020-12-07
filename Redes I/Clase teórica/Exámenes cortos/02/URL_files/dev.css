@@ -1,0 +1,113 @@
+/* Support and library buttons
+-------------------------*/
+.contenedor {
+	position: relative;
+	height: 39px;
+	padding: 4px;
+	width: 280px;
+}
+
+.contenedor img {
+	position: absolute;
+	left: 0;
+	transition: opacity  500ms ase-in-out;
+}
+
+.contenedor img.top:hover {
+	opacity: 0;
+}
+
+.contenedor img.dev {
+	position: absolute;
+	left: 150px;
+	transition: opacity  500ms ase-in-out;
+}
+
+.contenedor img.dev:hover {
+	left: 150px;
+	opacity: 0;
+}
+
+.visible-lg {
+  display: none !important;
+}
+
+@media (min-width: 240px) {
+  .visible-lg {
+    display: block !important;
+  }
+  table.visible-lg {
+    display: table !important;
+  }
+  tr.visible-lg {
+    display: table-row !important;
+  }
+  th.visible-lg,
+  td.visible-lg {
+    display: table-cell !important;
+  }
+}
+
+.contenedor2 {
+	position: relative;
+	height: 39px;
+	padding: 4px;
+	width: 114px;
+}
+
+.contenedor2 button{
+	border-bottom-right-radius: 0;
+}
+
+@media (max-width: 473px){
+	.contenedor2 button{
+		border-bottom-right-radius: 4px;
+	}
+}
+
+@media (min-width: 240px) and (max-width: 332px){
+
+	.contenedor2{
+		bottom: 88px;
+	}
+	.contenedor2 button{
+		margin-left: -11px;
+	}
+}
+
+@media (min-width: 332px) and (max-width: 464px) {
+
+	.contenedor2 {
+		bottom: 67px;
+	}
+
+}
+
+@media (min-width: 465px) and (max-width: 473px){
+	.contenedor2 {
+		bottom: 46px;
+	}
+}
+
+.contenedor2 img {
+	position: absolute;
+	left: 0;
+	transition: opacity  500ms ase-in-out;
+}
+
+.contenedor2 img.top:hover {
+	opacity: 0;
+}
+
+.contenedor2 button{
+	background: #1ABC9C;
+}
+
+.contenedor2 button:hover{
+	background: #4f4f4f;
+}
+
+.edit-nav input{
+	width: 126.917px;
+}
+
