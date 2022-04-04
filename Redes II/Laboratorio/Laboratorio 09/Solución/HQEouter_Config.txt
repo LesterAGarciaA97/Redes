@@ -1,0 +1,156 @@
+HQ#show run
+Building configuration...
+
+Current configuration : 2438 bytes
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname HQ
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+archive
+ log config
+  hidekeys
+!
+!
+crypto isakmp policy 1
+ encr aes
+ authentication pre-share
+ group 2
+crypto isakmp key cisco123 address 209.165.200.242
+!
+!
+crypto ipsec transform-set Branch-VPN esp-3des esp-sha-hmac
+!
+crypto map Branch-MAP 10 ipsec-isakmp
+ set peer 209.165.200.242
+ set transform-set Branch-VPN
+ match address Branch-VPN-ACL
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+interface Loopback0
+ description HQ email server address
+ ip address 10.10.20.238 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly
+!
+interface Loopback1
+ description Headquarters LAN
+ ip address 10.10.10.1 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly
+!
+interface Tunnel0
+ ip address 172.16.100.1 255.255.255.252
+ tunnel source 209.165.200.226
+ tunnel destination 209.165.200.242
+!
+interface FastEthernet0
+ no ip address
+ shutdown
+ speed auto
+!
+interface Serial0
+ no ip address
+ shutdown
+!
+interface Serial1
+ description Connection to ISP
+ bandwidth 64
+ ip address 209.165.200.226 255.255.255.248
+ ip nat outside
+ ip virtual-reassembly
+ clock rate 64000
+ crypto map Branch-MAP
+!
+router eigrp 1
+ network 10.10.0.0 0.0.255.255
+ network 172.16.100.0 0.0.0.3
+ auto-summary
+!
+ip forward-protocol nd
+ip route 0.0.0.0 0.0.0.0 209.165.200.225
+!
+!
+no ip http server
+no ip http secure-server
+ip nat pool HQ-NAT-POOL 209.165.200.233 209.165.200.237 prefix-length 29
+ip nat inside source list HQ-NAT-ACL pool HQ-NAT-POOL
+ip nat inside source static 10.10.20.238 209.165.200.238
+!
+ip access-list extended Branch-VPN-ACL
+ remark Branch to HQ GRE traffic to trigger VPN
+ permit gre host 209.165.200.226 host 209.165.200.242
+ip access-list extended HQ-NAT-ACL
+ remark Do not translate HQ LAN to Branch LAN addresses
+ deny   ip 10.10.0.0 0.0.255.255 192.168.1.0 0.0.0.255
+ remark Translate Local LAN to all other Internet destinations
+ permit ip 10.10.0.0 0.0.255.255 any
+!
+no cdp log mismatch duplex
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login
+!
+end

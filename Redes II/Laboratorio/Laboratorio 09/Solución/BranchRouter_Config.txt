@@ -1,0 +1,148 @@
+Branch#show run
+Building configuration...
+
+Current configuration : 2207 bytes
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname Branch
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+archive
+ log config
+  hidekeys
+!
+!
+crypto isakmp policy 1
+ encr aes
+ authentication pre-share
+ group 2
+crypto isakmp key cisco123 address 209.165.200.226
+!
+!
+crypto ipsec transform-set HQ-VPN esp-3des esp-sha-hmac
+!
+crypto map HQ-MAP 10 ipsec-isakmp
+ set peer 209.165.200.226
+ set transform-set HQ-VPN
+ match address HQ-VPN-ACL
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+interface Loopback1
+ description Branch LAN
+ ip address 192.168.1.1 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly
+!
+interface Tunnel0
+ ip address 172.16.100.2 255.255.255.252
+ tunnel source 209.165.200.242
+ tunnel destination 209.165.200.226
+!
+interface FastEthernet0
+ no ip address
+ shutdown
+ speed auto
+!
+interface Serial0
+ no ip address
+ shutdown
+!
+interface Serial1
+ description Connection to ISP
+ bandwidth 64
+ ip address 209.165.200.242 255.255.255.248
+ ip nat outside
+ ip virtual-reassembly
+ crypto map HQ-MAP
+!
+router eigrp 1
+ network 172.16.100.0 0.0.0.3
+ network 192.168.1.0
+ auto-summary
+!
+ip forward-protocol nd
+ip route 0.0.0.0 0.0.0.0 209.165.200.241
+!
+!
+no ip http server
+no ip http secure-server
+ip nat pool BRANCH-NAT-POOL 209.165.200.249 209.165.200.254 prefix-length 29
+ip nat inside source list BRANCH-NAT-ACL pool BRANCH-NAT-POOL
+!
+ip access-list extended BRANCH-NAT-ACL
+ remark Do not translate Local LAN to HQ LAN addresses
+ deny   ip 192.168.1.0 0.0.0.255 10.10.0.0 0.0.255.255
+ remark Translate Local LAN to all other Internet destinations
+ permit ip 192.168.1.0 0.0.0.255 any
+ip access-list extended HQ-VPN-ACL
+ remark HQ to Branch GRE traffic to trigger VPN
+ permit gre host 209.165.200.242 host 209.165.200.226
+!
+no cdp log mismatch duplex
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ login
+!
+end
